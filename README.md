@@ -20,6 +20,15 @@ A portfolio CMS with a React + TypeScript website, Spring Boot REST API, Postgre
 - Docker Desktop
 - Android Studio (optional, for Android emulator)
 
+## System design and architecture
+
+Architecture documentation is maintained under [docs/architecture](docs/architecture/):
+- [System design](docs/architecture/system-design.md) — components, API surface, request flows, security, persistence, deployment, reliability, and future gaps.
+- [Architecture diagrams](docs/architecture/diagrams.md) — Mermaid system context, deployment, runtime, authentication, project-read and CI flows.
+- [Architecture decision records](docs/architecture/decisions.md) — rationale and consequences for the main technology choices.
+
+These documents distinguish current implementation from proposed production deployment and future features.
+
 ## Quick start: backend + database
 1. Copy `.env.example` to `.env` and change `JWT_SECRET` and `ADMIN_PASSWORD`.
 2. Start the database and API:
