@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowDownRight, ArrowRight, Github, Linkedin, Mail, Menu, X, ExternalLink, Code2, Layers3, Smartphone, Terminal, Sparkles, Sun, Moon, Pencil, Trash2, Check, XCircle } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, Github, Linkedin, Mail, Menu, X, ExternalLink, Code2, Layers3, Smartphone, Terminal, Sparkles, Sun, Moon, Pencil, Trash2, XCircle } from 'lucide-react'
 
 type Project = {
   id?: number; title: string; slug: string; summary: string; description?: string
