@@ -1,0 +1,39 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: axemax-studio-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/axemax}
+    username: ${SPRING_DATASOURCE_USERNAME:axemax}
+    password: ${SPRING_DATASOURCE_PASSWORD:change-this-local-password}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  jackson:
+    default-property-inclusion: non_null
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+app:
+  jwt:
+    secret: ${JWT_SECRET:replace-with-a-long-random-secret-at-least-32-bytes}
+    expiration-minutes: 30
+  admin:
+    email: ${ADMIN_EMAIL:admin@axemax.local}
+    password: ${ADMIN_PASSWORD:ChangeMe123!ReplaceBeforeUse}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
