@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import PortfolioBuilder from './PortfolioBuilder'
-import { ArrowDownRight, ArrowRight, Github, Linkedin, Mail, Menu, X, ExternalLink, Code2, Layers3, Smartphone, Terminal, Sparkles, Sun, Moon, Pencil, Trash2, XCircle } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, Github, Linkedin, Mail, Menu, X, ExternalLink, Code2, Layers3, Smartphone, Terminal, Sparkles, Sun, Moon, Pencil, Trash2, XCircle, FileText, Download } from 'lucide-react'
 
 type Project = {
   id?: number; title: string; slug: string; summary: string; description?: string
@@ -105,6 +105,7 @@ export default function App() {
       <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen ? <X/> : <Menu/>}</button>
       <nav className={menuOpen ? 'nav-links nav-open' : 'nav-links'}>
         <a onClick={() => setMenuOpen(false)} href="#work">Work</a><a onClick={() => setMenuOpen(false)} href="#about">About</a><a onClick={() => setMenuOpen(false)} href="#stack">Stack</a><a onClick={() => setMenuOpen(false)} href="#contact">Contact</a>
+        <button className="nav-builder" onClick={() => { setBuilderOpen(true); setMenuOpen(false) }}>Build portfolio <ArrowRight size={14}/></button>
         <button className="theme-toggle" onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>{theme === 'dark' ? <Sun size={15}/> : <Moon size={15}/>}<span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span></button>
         <button className="nav-cta" onClick={() => {setAdminOpen(!adminOpen); setMenuOpen(false)}}>Studio admin <ArrowRight size={15}/></button>
       </nav>
@@ -115,7 +116,7 @@ export default function App() {
         <div className="hero-copy">
           <div className="eyebrow"><span className="live-dot"/>{apiStatus === 'connected' ? 'CONNECTED TO AXEMAX API' : 'INDEPENDENT IDEAS. THOUGHTFUL ENGINEERING.'}</div>
           <h1>Build beyond<br/><span>the expected.</span></h1>
-          <p className="hero-text">A digital studio for useful ideas, carefully engineered products, and experiences that make complex things feel simple.</p>
+          <p className="hero-text">Create a professional portfolio that tells your story. Bring your skills, experience, and projects together, choose a style, and export a polished PDF—all in one simple workspace.</p>
           <div className="hero-actions"><button className="button button-primary" onClick={() => setBuilderOpen(true)}>Build your portfolio <ArrowRight size={16}/></button><a className="button button-quiet" href="#work">Explore the platform <ArrowDownRight size={17}/></a></div>
           <div className="hero-meta"><span><i/> Full-stack development</span><span><i/> Web & mobile</span><span><i/> API-first thinking</span></div>
         </div>
@@ -132,9 +133,9 @@ export default function App() {
       <section className="platform-section section-wrap" id="platform">
         <div className="section-heading"><div><div className="eyebrow">YOUR STORY, BEAUTIFULLY PRESENTED</div><h2>From experience to <span>opportunity.</span></h2></div><p>One place to shape your story,<br/>showcase your work, and move forward.</p></div>
         <div className="platform-grid">
-          <article className="platform-card"><span className="platform-number">01</span><span className="platform-icon"><FileTextIcon /></span><h3>Build your story</h3><p>Bring your professional profile, experience, skills, education, certifications and projects together in one clear portfolio.</p><span className="platform-tag">GUIDED EDITOR</span></article>
+          <article className="platform-card"><span className="platform-number">01</span><span className="platform-icon"><FileText size={20}/></span><h3>Build your story</h3><p>Bring your professional profile, experience, skills, education, certifications and projects together in one clear portfolio.</p><span className="platform-tag">GUIDED EDITOR</span></article>
           <article className="platform-card"><span className="platform-number">02</span><span className="platform-icon"><Layers3 size={20}/></span><h3>Make it yours</h3><p>Choose a visual style, switch between light and dark preview, and refine your content while seeing the result live.</p><span className="platform-tag">LIVE PREVIEW</span></article>
-          <article className="platform-card"><span className="platform-number">03</span><span className="platform-icon"><DownloadIcon /></span><h3>Take it anywhere</h3><p>Export a print-ready PDF you can attach to job applications, share with clients, or keep as your career snapshot.</p><span className="platform-tag">PDF EXPORT</span></article>
+          <article className="platform-card"><span className="platform-number">03</span><span className="platform-icon"><Download size={20}/></span><h3>Take it anywhere</h3><p>Export a print-ready PDF you can attach to job applications, share with clients, or keep as your career snapshot.</p><span className="platform-tag">PDF EXPORT</span></article>
         </div>
         <div className="platform-banner"><div><div className="eyebrow">START WITH WHAT YOU HAVE</div><h3>Your next opportunity deserves a better introduction.</h3><p>No design skills required. Start with a sample, personalize it, and make it yours.</p></div><button className="button button-primary" onClick={() => setBuilderOpen(true)}>Create my portfolio <ArrowRight size={15}/></button></div>
       </section>
