@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import PortfolioBuilder from './PortfolioBuilder'
 import { ArrowDownRight, ArrowRight, Github, Linkedin, Mail, Menu, X, ExternalLink, Code2, Layers3, Smartphone, Terminal, Sparkles, Sun, Moon, Pencil, Trash2, XCircle } from 'lucide-react'
 
 type Project = {
@@ -24,6 +25,7 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [apiStatus, setApiStatus] = useState<'loading' | 'connected' | 'demo'>('loading')
   const [adminOpen, setAdminOpen] = useState(false)
+  const [builderOpen, setBuilderOpen] = useState(false)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('axemax-theme') as 'dark' | 'light') || 'dark')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [token, setToken] = useState('')
@@ -94,6 +96,8 @@ export default function App() {
     } catch (err) { setNotice(err instanceof Error ? err.message : 'Could not save project.') }
   }
 
+  if (builderOpen) return <PortfolioBuilder onClose={() => setBuilderOpen(false)} initialTheme={theme} />
+
   return <div className="site-shell" data-theme={theme}>
     <div className="ambient ambient-one" /><div className="ambient ambient-two" />
     <header className="topbar">
@@ -112,7 +116,7 @@ export default function App() {
           <div className="eyebrow"><span className="live-dot"/>{apiStatus === 'connected' ? 'CONNECTED TO AXEMAX API' : 'INDEPENDENT IDEAS. THOUGHTFUL ENGINEERING.'}</div>
           <h1>Build beyond<br/><span>the expected.</span></h1>
           <p className="hero-text">A digital studio for useful ideas, carefully engineered products, and experiences that make complex things feel simple.</p>
-          <div className="hero-actions"><a className="button button-primary" href="#work">Explore selected work <ArrowDownRight size={17}/></a><a className="button button-quiet" href="#contact">Let’s connect <ArrowRight size={16}/></a></div>
+          <div className="hero-actions"><button className="button button-primary" onClick={() => setBuilderOpen(true)}>Build your portfolio <ArrowRight size={16}/></button><a className="button button-quiet" href="#work">Explore the platform <ArrowDownRight size={17}/></a></div>
           <div className="hero-meta"><span><i/> Full-stack development</span><span><i/> Web & mobile</span><span><i/> API-first thinking</span></div>
         </div>
         <div className="hero-visual" aria-label="Abstract AxeMax brand graphic">
@@ -123,6 +127,16 @@ export default function App() {
           <div className="visual-caption">AXEMAX / DIGITAL STUDIO <span>001 — 025</span></div>
         </div>
         <div className="hero-index"><span>01</span><span className="index-line"/><span>SCROLL TO EXPLORE</span></div>
+      </section>
+
+      <section className="platform-section section-wrap" id="platform">
+        <div className="section-heading"><div><div className="eyebrow">YOUR STORY, BEAUTIFULLY PRESENTED</div><h2>From experience to <span>opportunity.</span></h2></div><p>One place to shape your story,<br/>showcase your work, and move forward.</p></div>
+        <div className="platform-grid">
+          <article className="platform-card"><span className="platform-number">01</span><span className="platform-icon"><FileTextIcon /></span><h3>Build your story</h3><p>Bring your professional profile, experience, skills, education, certifications and projects together in one clear portfolio.</p><span className="platform-tag">GUIDED EDITOR</span></article>
+          <article className="platform-card"><span className="platform-number">02</span><span className="platform-icon"><Layers3 size={20}/></span><h3>Make it yours</h3><p>Choose a visual style, switch between light and dark preview, and refine your content while seeing the result live.</p><span className="platform-tag">LIVE PREVIEW</span></article>
+          <article className="platform-card"><span className="platform-number">03</span><span className="platform-icon"><DownloadIcon /></span><h3>Take it anywhere</h3><p>Export a print-ready PDF you can attach to job applications, share with clients, or keep as your career snapshot.</p><span className="platform-tag">PDF EXPORT</span></article>
+        </div>
+        <div className="platform-banner"><div><div className="eyebrow">START WITH WHAT YOU HAVE</div><h3>Your next opportunity deserves a better introduction.</h3><p>No design skills required. Start with a sample, personalize it, and make it yours.</p></div><button className="button button-primary" onClick={() => setBuilderOpen(true)}>Create my portfolio <ArrowRight size={15}/></button></div>
       </section>
 
       {adminOpen && <section className="admin-panel section-wrap">
@@ -146,7 +160,7 @@ export default function App() {
         {apiStatus==='demo' && <p className="api-note"><span className="live-dot"/> Preview mode — sample projects are shown until the Spring Boot API is running.</p>}
       </section>
 
-      <section className="about-section section-wrap" id="about"><div className="about-left"><div className="eyebrow">THE STUDIO APPROACH</div><h2>Make it useful.<br/><span>Make it last.</span></h2></div><div className="about-right"><p className="about-lead">AxeMax Studio is a learning-led digital portfolio built around a simple idea: good software should be understandable, dependable, and a pleasure to use.</p><p>This space brings together experiments across backend engineering, modern interfaces, API design, and mobile experiences. Each project is an opportunity to build something real—and explain how it works.</p><a className="text-link" href="#contact">Have a project in mind? <ArrowRight size={16}/></a></div></section>
+      <section className="about-section section-wrap" id="about"><div className="about-left"><div className="eyebrow">THE STUDIO APPROACH</div><h2>Make it useful.<br/><span>Make it last.</span></h2></div><div className="about-right"><p className="about-lead">AxeMax Studio is a digital workspace that helps people present their skills, experience, and ideas with clarity and confidence.</p><p>We believe a great portfolio should be accessible to everyone—not only people who know how to design or code a website. Our goal is to make professional self-presentation simpler with guided content, thoughtful templates, live previews, and portable PDF exports.</p><p>Built with a practical engineering mindset, AxeMax Studio brings together clean design, useful tools, and a learning-led approach. We are growing toward a platform where creators can build their professional identity, showcase meaningful work, and share it with the world.</p><a className="text-link" href="#platform">Explore what you can create <ArrowRight size={16}/></a></div></section>
 
       <section className="stack-section section-wrap" id="stack"><div className="section-heading"><div><div className="eyebrow">TOOLS OF THE TRADE</div><h2>Built with <span>intention.</span></h2></div><p>Reliable foundations for<br/>ideas that keep growing.</p></div><div className="skill-grid">{skills.map(({title,items,icon:Icon},i)=><article className="skill-card" key={title}><div className="skill-top"><span className="skill-icon"><Icon size={20}/></span><span>0{i+1}</span></div><h3>{title}</h3><p>{items}</p></article>)}</div><div className="tech-strip">{techs.map(t=><span key={t}>{t}</span>)}</div></section>
 
@@ -155,4 +169,4 @@ export default function App() {
     <footer className="footer section-wrap"><a className="brand" href="#home"><span className="brand-mark">A<span>M</span></span><span className="brand-name">AXEMAX<span>STUDIO</span></span></a><span>© {new Date().getFullYear()} AXEMAX STUDIO. BUILT WITH INTENTION.</span><div className="footer-social"><a href="https://github.com/" aria-label="GitHub"><Github size={17}/></a><a href="https://linkedin.com/" aria-label="LinkedIn"><Linkedin size={17}/></a></div></footer>
   </div>
 }
-function ArrowUpRightIcon(){ return <ArrowRight size={17}/> }
+function ArrowUpRightIcon(){ return <ArrowRight size={17}/> }\nfunction FileTextIcon(){ return <Mail size={20}/> }\nfunction DownloadIcon(){ return <ArrowDownRight size={20}/> }
