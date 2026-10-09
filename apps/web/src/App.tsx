@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowDownRight, ArrowRight, Github, Linkedin, Mail, Menu, X, ExternalLink, Code2, Layers3, Smartphone, Terminal, Sparkles } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, Github, Linkedin, Mail, Menu, X, ExternalLink, Code2, Layers3, Smartphone, Terminal, Sparkles, Sun, Moon, Pencil, Trash2, Check, XCircle } from 'lucide-react'
 
 type Project = {
   id?: number; title: string; slug: string; summary: string; description?: string
@@ -24,6 +24,8 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [apiStatus, setApiStatus] = useState<'loading' | 'connected' | 'demo'>('loading')
   const [adminOpen, setAdminOpen] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem('axemax-theme') as 'dark' | 'light') || 'dark')
+  const [editingId, setEditingId] = useState<number | null>(null)
   const [token, setToken] = useState('')
   const [email, setEmail] = useState('admin@axemax.local')
   const [password, setPassword] = useState('')
@@ -33,6 +35,11 @@ export default function App() {
   const [projectSummary, setProjectSummary] = useState('')
   const [projectTech, setProjectTech] = useState('Java, Spring Boot, React')
   const [projectDescription, setProjectDescription] = useState('')
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('axemax-theme', theme)
+  }, [theme])
 
   useEffect(() => {
     fetch('/api/v1/projects?page=0&size=20')
@@ -52,26 +59,49 @@ export default function App() {
       const data = await r.json(); setToken(data.accessToken); setNotice('Admin session started.')
     } catch (err) { setNotice(err instanceof Error ? err.message : 'Could not log in.') }
   }
+  function startEditing(project: Project) {
+    if (project.id == null) { setNotice('This sample project is read-only. Connect the API to edit saved projects.'); return }
+    setEditingId(project.id); setProjectTitle(project.title); setProjectSlug(project.slug); setProjectSummary(project.summary)
+    setProjectDescription(project.description ?? project.summary); setProjectTech(project.technologies); setNotice('Editing project — save your changes when ready.')
+    document.querySelector('.admin-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  function resetProjectForm() {
+    setEditingId(null); setProjectTitle(''); setProjectSlug(''); setProjectSummary(''); setProjectDescription(''); setProjectTech('Java, Spring Boot, React')
+  }
+  async function deleteProject(project: Project) {
+    if (project.id == null) { setNotice('Sample projects cannot be deleted.'); return }
+    if (!window.confirm(`Delete “${project.title}”? This cannot be undone.`)) return
+    try {
+      const r = await fetch(`/api/v1/admin/projects/${project.id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
+      if (!r.ok) throw new Error('Could not delete project. Check API logs.')
+      setProjects(old => old.filter(p => p.id !== project.id)); setNotice('Project deleted.')
+      if (editingId === project.id) resetProjectForm()
+    } catch (err) { setNotice(err instanceof Error ? err.message : 'Could not delete project.') }
+  }
   async function createProject(e: React.FormEvent) {
     e.preventDefault(); setNotice('')
     const slug = projectSlug || projectTitle.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     try {
-      const r = await fetch('/api/v1/admin/projects', { method:'POST', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify({
+      const r = await fetch(editingId == null ? '/api/v1/admin/projects' : `/api/v1/admin/projects/${editingId}`, { method: editingId == null ? 'POST' : 'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}, body: JSON.stringify({
         title: projectTitle, slug, summary: projectSummary, description: projectDescription || projectSummary,
         technologies: projectTech, status:'PUBLISHED', featured:false
       }) })
       if (!r.ok) throw new Error('Could not create project. Check required fields and API logs.')
-      const saved = await r.json(); setProjects(old => [saved, ...old]); setNotice('Project published.'); setProjectTitle(''); setProjectSlug(''); setProjectSummary(''); setProjectDescription('')
+      const saved = r.status === 204 ? null : await r.json();
+      if (editingId == null) { if (saved) setProjects(old => [saved, ...old]); setNotice('Project published.') }
+      else { setProjects(old => old.map(p => p.id === editingId ? (saved ?? { ...p, title: projectTitle, slug, summary: projectSummary, description: projectDescription || projectSummary, technologies: projectTech }) : p)); setNotice('Project updated.') }
+      resetProjectForm()
     } catch (err) { setNotice(err instanceof Error ? err.message : 'Could not save project.') }
   }
 
-  return <div className="site-shell">
+  return <div className="site-shell" data-theme={theme}>
     <div className="ambient ambient-one" /><div className="ambient ambient-two" />
     <header className="topbar">
       <a className="brand" href="#home" aria-label="AxeMax Studio home"><span className="brand-mark">A<span>M</span></span><span className="brand-name">AXEMAX<span>STUDIO</span></span></a>
       <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">{menuOpen ? <X/> : <Menu/>}</button>
       <nav className={menuOpen ? 'nav-links nav-open' : 'nav-links'}>
         <a onClick={() => setMenuOpen(false)} href="#work">Work</a><a onClick={() => setMenuOpen(false)} href="#about">About</a><a onClick={() => setMenuOpen(false)} href="#stack">Stack</a><a onClick={() => setMenuOpen(false)} href="#contact">Contact</a>
+        <button className="theme-toggle" onClick={() => setTheme(current => current === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>{theme === 'dark' ? <Sun size={15}/> : <Moon size={15}/>}<span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span></button>
         <button className="nav-cta" onClick={() => {setAdminOpen(!adminOpen); setMenuOpen(false)}}>Studio admin <ArrowRight size={15}/></button>
       </nav>
     </header>
@@ -98,7 +128,8 @@ export default function App() {
       {adminOpen && <section className="admin-panel section-wrap">
         <div className="section-heading"><div><div className="eyebrow">PRIVATE WORKSPACE</div><h2>Studio admin</h2></div><button className="icon-button" onClick={() => {setAdminOpen(false);setNotice('')}}><X/></button></div>
         {!token ? <form className="admin-form" onSubmit={login}><label>Email<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label>Password<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required/></label><button className="button button-primary">Sign in <ArrowRight size={15}/></button></form> :
-        <form className="admin-form admin-grid" onSubmit={createProject}><label>Project title<input value={projectTitle} onChange={e=>setProjectTitle(e.target.value)} required/></label><label>Slug (optional)<input value={projectSlug} onChange={e=>setProjectSlug(e.target.value)} placeholder="auto-generated"/></label><label className="wide">Summary<input value={projectSummary} onChange={e=>setProjectSummary(e.target.value)} required/></label><label className="wide">Description<textarea value={projectDescription} onChange={e=>setProjectDescription(e.target.value)} /></label><label className="wide">Technologies (comma-separated)<input value={projectTech} onChange={e=>setProjectTech(e.target.value)} required/></label><button className="button button-primary">Publish project <ArrowRight size={15}/></button><button type="button" className="button button-quiet" onClick={()=>{setToken('');setPassword('');setNotice('Signed out.')}}>Sign out</button></form>}
+        <form className="admin-form admin-grid" onSubmit={createProject}><label>Project title<input value={projectTitle} onChange={e=>setProjectTitle(e.target.value)} required/></label><label>Slug (optional)<input value={projectSlug} onChange={e=>setProjectSlug(e.target.value)} placeholder="auto-generated"/></label><label className="wide">Summary<input value={projectSummary} onChange={e=>setProjectSummary(e.target.value)} required/></label><label className="wide">Description<textarea value={projectDescription} onChange={e=>setProjectDescription(e.target.value)} /></label><label className="wide">Technologies (comma-separated)<input value={projectTech} onChange={e=>setProjectTech(e.target.value)} required/></label><button className="button button-primary">{editingId == null ? 'Publish project' : 'Save changes'} <ArrowRight size={15}/></button>{editingId != null && <button type="button" className="button button-quiet" onClick={resetProjectForm}>Cancel edit <XCircle size={15}/></button>}<button type="button" className="button button-quiet" onClick={()=>{setToken('');setPassword('');setEditingId(null);setNotice('Signed out.')}}>Sign out</button></form>}
+        {token && <div className="admin-projects"><div className="admin-list-heading"><div><div className="eyebrow">CONTENT MANAGEMENT</div><h3>Manage projects <span>{projects.length}</span></h3></div><button type="button" className="button button-quiet" onClick={resetProjectForm}>New project <ArrowRight size={14}/></button></div><div className="admin-project-list">{projects.map(project => <article className="admin-project-row" key={project.id ?? project.slug}><div className="admin-project-copy"><strong>{project.title}</strong><span>{project.technologies}</span></div><div className="admin-project-actions"><button type="button" className="icon-button" aria-label={`Edit ${project.title}`} title="Edit project" onClick={() => startEditing(project)}><Pencil size={15}/></button><button type="button" className="icon-button danger" aria-label={`Delete ${project.title}`} title="Delete project" onClick={() => deleteProject(project)}><Trash2 size={15}/></button></div></article>)}</div></div>}
         {notice && <p className="form-notice" role="status">{notice}</p>}
       </section>}
 
