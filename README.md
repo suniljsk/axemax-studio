@@ -78,3 +78,22 @@ backend        Spring Boot API
 infra          Docker-related notes
 .github        CI workflow
 ```
+
+
+## Portfolio builder (web)
+
+The public website includes a guided portfolio builder for visitors:
+- Edit profile details, contact links, summary, skills, experience, projects, education, and certifications.
+- Preview changes live in the Modern, Minimal, and Developer layouts.
+- Switch the preview between dark and light workspace themes.
+- Draft content is saved locally in the current browser using `localStorage`; it is not yet synced to a user account or the backend.
+- Choose **Download PDF** to open the browser print dialog, then select **Save as PDF**. Print styling hides the editor and exports the portfolio preview on A4 pages.
+
+### Test the portfolio builder
+1. Start the API/database using the backend quick-start instructions (the landing page also works in preview mode without the API).
+2. Start the web app with `cd apps/web && npm install && npm run dev`.
+3. Select **Build portfolio**, edit the profile and projects, change a template, and verify the preview updates.
+4. Select **Download PDF** and choose **Save as PDF**.
+5. Run `npm run build` and `npm test` in `apps/web`.
+
+Note: this is the first public builder iteration. Account registration, cloud-saved user portfolios, public shareable portfolio URLs, and direct server-generated PDF files are planned follow-up features; the current PDF export uses the browser's print-to-PDF flow.
