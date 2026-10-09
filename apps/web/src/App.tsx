@@ -170,4 +170,4 @@ export default function App() {
     <footer className="footer section-wrap"><a className="brand" href="#home"><span className="brand-mark">A<span>M</span></span><span className="brand-name">AXEMAX<span>STUDIO</span></span></a><span>© {new Date().getFullYear()} AXEMAX STUDIO. BUILT WITH INTENTION.</span><div className="footer-social"><a href="https://github.com/" aria-label="GitHub"><Github size={17}/></a><a href="https://linkedin.com/" aria-label="LinkedIn"><Linkedin size={17}/></a></div></footer>
   </div>
 }
-function ArrowUpRightIcon(){ return <ArrowRight size={17}/> }\nfunction FileTextIcon(){ return <Mail size={20}/> }\nfunction DownloadIcon(){ return <ArrowDownRight size={20}/> }
+function ArrowUpRightIcon(){ return <ArrowRight size={17}/> }
