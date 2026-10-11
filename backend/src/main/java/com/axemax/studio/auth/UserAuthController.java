@@ -16,7 +16,7 @@ public class UserAuthController {
     @PostMapping("/register")
     public UserAuthService.RegistrationResult register(@Valid @RequestBody RegisterRequest request) {
         return service.register(new UserAuthService.RegisterRequest(
-            request.username(), request.email(), request.phoneNumber(), request.password()));
+            request.username(), request.email(), request.phoneNumber(), request.password(), request.confirmPassword()));
     }
 
     @GetMapping("/verify-email")
@@ -40,7 +40,8 @@ public class UserAuthController {
         @NotBlank @Email @Size(max=255) String email,
         @NotBlank @Pattern(regexp="^\\+[1-9][0-9]{7,14}$", message="Use phone number in international format, e.g. +919876543210")
         String phoneNumber,
-        @NotBlank @Size(min=10, max=72, message="Password must contain 10 to 72 characters") String password) {}
+        @NotBlank @Size(min=10, max=72, message="Password must contain 10 to 72 characters") String password,
+        @NotBlank @Size(min=10, max=72, message="Confirm password must contain 10 to 72 characters") String confirmPassword) {}
 
     public record LoginRequest(@NotBlank String identifier, @NotBlank String password) {}
     public record PhoneVerificationRequest(@NotBlank String identifier, @NotBlank @Pattern(regexp="[0-9]{6}") String code) {}
