@@ -38,7 +38,7 @@ public class UserAuthController {
         @NotBlank @Size(min=3, max=40) @Pattern(regexp="[A-Za-z0-9_.-]+", message="Use letters, numbers, dot, underscore or hyphen for username")
         String username,
         @NotBlank @Email @Size(max=255) String email,
-        @NotBlank @Pattern(regexp="^\+[1-9][0-9]{7,14}$", message="Use phone number in international format, e.g. +919876543210")
+        @NotBlank @Pattern(regexp="^\\+[1-9][0-9]{7,14}$", message="Use phone number in international format, e.g. +919876543210")
         String phoneNumber,
         @NotBlank @Size(min=10, max=72, message="Password must contain 10 to 72 characters") String password) {}
 
