@@ -38,6 +38,9 @@ public class UserAuthService {
 
     @Transactional
     public RegistrationResult register(RegisterRequest request) {
+        if (request.confirmPassword() == null || !request.password().equals(request.confirmPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match.");
+        }
         String username = request.username().trim().toLowerCase(Locale.ROOT);
         String email = request.email().trim().toLowerCase(Locale.ROOT);
         String phone = request.phoneNumber().trim();
@@ -149,7 +152,7 @@ public class UserAuthService {
         return MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8), actual.getBytes(StandardCharsets.UTF_8));
     }
 
-    public record RegisterRequest(String username, String email, String phoneNumber, String password) {}
+    public record RegisterRequest(String username, String email, String phoneNumber, String password, String confirmPassword) {}
     public record LoginRequest(String identifier, String password) {}
     public record PhoneVerificationRequest(String identifier, String code) {}
     public record RegistrationResult(String username, String email, boolean emailVerificationSent, boolean phoneVerificationSent, String message) {}
