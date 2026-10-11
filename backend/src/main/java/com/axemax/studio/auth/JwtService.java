@@ -23,14 +23,22 @@ public class JwtService {
         this.expirationMinutes = expirationMinutes;
     }
 
-    public String createToken(String email) {
+    public String createToken(String email) { return createToken(email, "ADMIN"); }
+
+    public String createToken(String email, String role) {
         Instant now = Instant.now();
-        return Jwts.builder().subject(email).claim("role", "ADMIN")
+        return Jwts.builder().subject(email).claim("role", role)
             .issuedAt(Date.from(now)).expiration(Date.from(now.plusSeconds(expirationMinutes * 60)))
             .signWith(key).compact();
     }
 
     public String extractSubject(String token) {
         return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload().getSubject();
+    }
+
+    public String extractRole(String token) {
+        String role = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload().get("role", String.class);
+        if (!"ADMIN".equals(role) && !"USER".equals(role)) throw new IllegalArgumentException("Invalid role claim");
+        return role;
     }
 }

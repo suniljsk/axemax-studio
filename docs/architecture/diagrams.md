@@ -111,3 +111,34 @@ flowchart LR
 ```
 
 Check the workflow file for the exact current jobs and triggers. This diagram is a high-level representation of the repository's CI purpose, not a guarantee that every suggested check is configured.
+
+## 7. User registration and verification
+
+```mermaid
+sequenceDiagram
+    actor Visitor
+    participant Web as React account panel
+    participant API as Spring Boot API
+    participant DB as PostgreSQL
+    participant Mail as SMTP provider
+    participant SMS as Twilio SMS
+
+    Visitor->>Web: Submit username, email, phone and password
+    Web->>API: POST /api/v1/auth/user/register
+    API->>DB: Store USER account and hashed verification tokens
+    API->>Mail: Send email confirmation link
+    API->>SMS: Send 6-digit phone OTP
+    API-->>Web: Registration created; verification required
+    Visitor->>Web: Open email link
+    Web->>API: GET /api/v1/auth/user/verify-email?token=...
+    API->>DB: Mark email verified
+    Visitor->>Web: Enter SMS code
+    Web->>API: POST /api/v1/auth/user/verify-phone
+    API->>DB: Mark phone verified
+    API->>Mail: Send Welcome to AxeMax Studio email
+    Visitor->>Web: Sign in with username/email and password
+    Web->>API: POST /api/v1/auth/user/login
+    API-->>Web: USER-role JWT after both verifications
+```
+
+This flow requires SMTP and Twilio credentials. It describes the feature implementation; actual delivery must be tested with configured provider accounts.

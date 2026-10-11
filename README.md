@@ -59,6 +59,38 @@ Set `EXPO_PUBLIC_API_URL` if the API is not reachable at `http://10.0.2.2:8080` 
 - Physical device: use your computer's LAN IP, e.g. `http://192.168.1.10:8080`
 - Production: use your deployed HTTPS API URL.
 
+## User accounts, verification and welcome email
+
+The web app provides separate **Studio admin** and **Sign in / Join** entry points. Public project browsing remains available, while the portfolio builder prompts visitors to sign in or create a user account.
+
+User registration collects a username, email address, phone number and password. Before user login is allowed, the account must complete both:
+1. Email confirmation using a link that expires after 24 hours.
+2. Phone confirmation using a six-digit SMS code that expires after 10 minutes (up to five code attempts).
+
+After both are verified, the API sends a **Welcome to AxeMax Studio!** email. Admin access remains separate and is configured using `ADMIN_EMAIL` and `ADMIN_PASSWORD`; public registration always creates the `USER` role and cannot grant admin access.
+
+### Required provider configuration
+
+Copy `.env.example` to `.env` and configure a real SMTP provider and Twilio SMS credentials before testing registration. The example SMTP host/port are development placeholders and do not send mail by themselves.
+
+- `APP_PUBLIC_BASE_URL`: frontend base URL used in the email verification link (for local development, `http://localhost:5173`).
+- `MAIL_FROM`: sender address permitted by your SMTP provider.
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_AUTH`, `SMTP_STARTTLS`: outgoing email provider settings.
+- `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`: Twilio credentials and sender number for SMS.
+- Keep provider credentials in `.env` or your deployment secret manager; never commit them.
+
+Phone numbers must be entered in international E.164 format, for example `+919876543210`. A Twilio account may require destination-number verification while it is in trial mode.
+
+### Authentication endpoints
+
+- `POST /api/v1/auth/user/register` — create an unverified user and send email/SMS verification.
+- `GET /api/v1/auth/user/verify-email?token=...` — confirm email from the verification link.
+- `POST /api/v1/auth/user/verify-phone` — JSON body: `{"identifier":"username-or-email","code":"123456"}`.
+- `POST /api/v1/auth/user/login` — JSON body: `{"identifier":"username-or-email","password":"..."}`; only fully verified users receive a USER JWT.
+- `POST /api/v1/auth/login` — existing admin login.
+
+The initial portfolio builder still stores drafts in the current browser's `localStorage`; account-backed cloud portfolios and public sharing are not implemented yet. User registration authenticates the user but does not imply that portfolio drafts are synced to PostgreSQL.
+
 ## API endpoints
 - `GET /api/v1/projects?page=0&size=12&technology=Java`
 - `GET /api/v1/projects/{slug}`
