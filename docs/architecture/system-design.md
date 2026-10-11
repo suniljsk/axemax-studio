@@ -119,6 +119,16 @@ Design rules:
 - Back up PostgreSQL and periodically test restoring a backup.
 - Browser `localStorage` portfolio drafts are client-local and are not a substitute for database backups.
 
+## User registration and verification
+
+Self-service user accounts are stored in `user_accounts` and always receive the `USER` role. Admin authentication remains separate and is configured with `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+
+Registration requires a username, email address, E.164 phone number and password. The backend stores a BCrypt password hash, a SHA-256 hash of the email verification token, and a SHA-256 hash of the phone OTP. The email link expires after 24 hours; the six-digit SMS code expires after 10 minutes and is limited to five attempts. User login returns a USER-role JWT only after both email and phone are confirmed. A welcome email is sent after both checks complete.
+
+Email delivery uses Spring Mail configured through SMTP environment variables. SMS delivery uses Twilio; provider credentials must be configured before registration can succeed. The web UI opens an account panel for sign-in, registration and phone verification. An email verification link returns to the SPA's `/verify-email?token=...` route.
+
+The user account does not yet mean portfolio drafts are stored in the backend: the current builder continues to use browser `localStorage`. Before production, add request throttling/resend controls, abuse monitoring, a robust mail/SMS retry strategy, and tests for token expiry, OTP attempt limits and duplicate-account races.
+
 ## 8. Security model
 
 ### Implemented foundations
