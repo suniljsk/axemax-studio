@@ -7,7 +7,7 @@ type Props = {
   onAuthenticated: (token: string, username: string) => void
 }
 
-type ApiMessage = { message?: string; username?: string; accountVerified?: boolean; emailVerified?: boolean; phoneVerified?: boolean; accessToken?: string }
+type ApiMessage = { message?: string; detail?: string; title?: string; username?: string; accountVerified?: boolean; emailVerified?: boolean; phoneVerified?: boolean; accessToken?: string }
 
 export default function AccountAccess({ onClose, onAuthenticated }: Props) {
   const [mode, setMode] = useState<'login' | 'register' | 'verify'>('login')
@@ -28,7 +28,7 @@ export default function AccountAccess({ onClose, onAuthenticated }: Props) {
     fetch('/api/v1/auth/user/verify-email?token=' + encodeURIComponent(token))
       .then(async response => {
         const data = await response.json().catch(() => ({})) as ApiMessage
-        if (!response.ok) throw new Error(data.message ?? 'This verification link is invalid or expired.')
+        if (!response.ok) throw new Error(data.message ?? data.detail ?? 'This verification link is invalid or expired.')
         setNotice(data.message ?? 'Email confirmed. Continue with phone verification.')
         window.history.replaceState({}, '', '/')
       })
@@ -60,7 +60,7 @@ export default function AccountAccess({ onClose, onAuthenticated }: Props) {
         body: JSON.stringify(body),
       })
       const data = await response.json().catch(() => ({})) as ApiMessage
-      if (!response.ok) throw new Error(data.message ?? 'Request failed. Please try again.')
+      if (!response.ok) throw new Error(data.message ?? data.detail ?? 'Request failed. Please try again.')
       if (mode === 'login' && data.accessToken) {
         onAuthenticated(data.accessToken, data.username ?? username)
         onClose()
@@ -103,7 +103,7 @@ export default function AccountAccess({ onClose, onAuthenticated }: Props) {
         {mode === 'register' && <>
           <label>Username<input value={username} onChange={e => setUsername(e.target.value)} minLength={3} maxLength={40} pattern="[A-Za-z0-9_.-]+" autoComplete="username" required placeholder="e.g. alex_dev"/></label>
           <label>Email address<input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required placeholder="you@example.com"/></label>
-          <label>Phone number<input type="tel" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} pattern="\+[1-9][0-9]{7,14}" required placeholder="+919876543210"/><small>Use international format including country code.</small></label>
+          <label>Phone number<input type="tel" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} pattern="\\+[1-9][0-9]{7,14}" required placeholder="+919876543210"/><small>Use international format including country code.</small></label>
           <label>Password<input type="password" value={password} onChange={e => setPassword(e.target.value)} minLength={10} maxLength={72} autoComplete="new-password" required placeholder="At least 10 characters"/><small>Use a unique password with at least 10 characters.</small></label>
         </>}
         {mode === 'login' && <>
