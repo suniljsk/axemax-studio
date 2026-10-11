@@ -29,10 +29,11 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/login", "/api/v1/contact", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health/**").permitAll()
+                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/user/**", "/api/v1/contact", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/projects/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .anyRequest().permitAll())
+                .requestMatchers("/api/v1/user/**").hasRole("USER")
+                .anyRequest().denyAll())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
     }
