@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HexFormat;
 import java.util.Locale;
-import java.util.Optional;
 
 @Service
 public class UserAuthService {
@@ -81,13 +80,14 @@ public class UserAuthService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verification link is invalid or expired.");
         }
         user.markEmailVerified();
+        users.saveAndFlush(user);
         maybeSendWelcomeEmail(user);
-        return new VerificationResult(user.getEmailVerified(), user.isPhoneVerified(),
+        users.saveAndFlush(user);
+        return new VerificationResult(user.isEmailVerified(), user.isPhoneVerified(),
             user.isFullyVerified(), user.getUsername(),
             user.isFullyVerified() ? "Email and phone are verified. You can sign in." : "Email confirmed. Please verify your phone to finish.");
     }
 
-    @Transactional
     public VerificationResult verifyPhone(PhoneVerificationRequest request) {
         String identifier = request.identifier().trim();
         UserAccount user = users.findByUsernameIgnoreCaseOrEmailIgnoreCase(identifier, identifier)
@@ -99,11 +99,14 @@ public class UserAuthService {
             || user.getPhoneOtpAttempts() >= MAX_OTP_ATTEMPTS || user.getPhoneOtpHash() == null
             || !constantTimeEquals(user.getPhoneOtpHash(), sha256(request.code()))) {
             user.incrementPhoneOtpAttempts();
+            users.saveAndFlush(user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Verification code is invalid or expired.");
         }
         user.markPhoneVerified();
+        users.saveAndFlush(user);
         maybeSendWelcomeEmail(user);
-        return new VerificationResult(user.getEmailVerified(), true, user.isFullyVerified(), user.getUsername(),
+        users.saveAndFlush(user);
+        return new VerificationResult(user.isEmailVerified(), true, user.isFullyVerified(), user.getUsername(),
             user.isFullyVerified() ? "Phone verified. Your account is ready." : "Phone confirmed. Please confirm your email to finish.");
     }
 
