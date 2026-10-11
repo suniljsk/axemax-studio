@@ -93,7 +93,7 @@ public class UserAuthService {
         UserAccount user = users.findByUsernameIgnoreCaseOrEmailIgnoreCase(identifier, identifier)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Account or code is invalid."));
         if (user.isPhoneVerified()) {
-            return new VerificationResult(user.getEmailVerified(), true, user.isFullyVerified(), user.getUsername(), "Phone number is already verified.");
+            return new VerificationResult(user.isEmailVerified(), true, user.isFullyVerified(), user.getUsername(), "Phone number is already verified.");
         }
         if (user.getPhoneOtpExpiresAt() == null || user.getPhoneOtpExpiresAt().isBefore(Instant.now())
             || user.getPhoneOtpAttempts() >= MAX_OTP_ATTEMPTS || user.getPhoneOtpHash() == null
