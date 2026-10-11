@@ -30,6 +30,7 @@ export default function AccountAccess({ onClose, onAuthenticated }: Props) {
         const data = await response.json().catch(() => ({})) as ApiMessage
         if (!response.ok) throw new Error(data.message ?? data.detail ?? 'This verification link is invalid or expired.')
         setNotice(data.message ?? 'Email confirmed. Continue with phone verification.')
+        setMode(data.accountVerified ? 'login' : 'verify')
         window.history.replaceState({}, '', '/')
       })
       .catch(err => setError(err instanceof Error ? err.message : 'Could not verify email.'))
