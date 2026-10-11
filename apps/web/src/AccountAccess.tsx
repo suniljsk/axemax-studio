@@ -104,7 +104,7 @@ export default function AccountAccess({ onClose, onAuthenticated }: Props) {
         {mode === 'register' && <>
           <label>Username<input value={username} onChange={e => setUsername(e.target.value)} minLength={3} maxLength={40} pattern="[A-Za-z0-9_.-]+" autoComplete="username" required placeholder="e.g. alex_dev"/></label>
           <label>Email address<input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required placeholder="you@example.com"/></label>
-          <label>Phone number<input type="tel" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} pattern="\\+[1-9][0-9]{7,14}" required placeholder="+919876543210"/><small>Use international format including country code.</small></label>
+          <label>Phone number<input type="tel" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} pattern="\+[1-9][0-9]{7,14}" required placeholder="+919876543210"/><small>Use international format including country code.</small></label>
           <label>Password<input type="password" value={password} onChange={e => setPassword(e.target.value)} minLength={10} maxLength={72} autoComplete="new-password" required placeholder="At least 10 characters"/><small>Use a unique password with at least 10 characters.</small></label>
         </>}
         {mode === 'login' && <>
